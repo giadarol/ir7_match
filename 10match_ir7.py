@@ -72,16 +72,16 @@ act_sp2 = SinglePassDispersion(
 zz1 = ["e.ds.r7.b1", tw1, "lhcb1"], ["e.ds.r7.b2", tw2, "lhcb2"]
 
 zz = ["betx", "bety", "alfx", "alfy", "dx", "dpx", "mux", "muy"]
+ww = [1e-4, 1e-4, 1e-4, 1e-4, 1e-6, 1e-6, 1e-6, 1e-6]
 
 tarlist = [
-    xt.Target(oo, tw[oo, ee], line=ll, at=ee, tol=1e-6)
+    xt.Target(oo, tw[oo, ee], line=ll, at=ee, tol=1e-7)
     for ee, tw, ll in zz1
-    for oo in zz
+    for oo,tl in zip(zz,ww)
 ] + [
-        xt.Target(action=act_sp1, tar="dx", value=-0.02103, tol=1e-6),
-        xt.Target(action=act_sp2, tar="dx", value=-0.02103, tol=1e-6),
+        xt.Target(action=act_sp1, tar="dx", value=-0.03126, tol=1e-7),
+        xt.Target(action=act_sp2, tar="dx", value=-0.03126, tol=1e-7),
     ]
-
 
 out=lhc.match(
     ele_start=("s.ds.l7.b1", "s.ds.l7.b2"),
@@ -94,7 +94,8 @@ out=lhc.match(
     assert_within_tol=False
 )
 
-for tt in tarlist:
+
+for tt in out['optimizer']._err.targets:
     if tt.line:
        nn=" ".join((tt.line,)+tt.tar)
        rr=tt.action.run()[tt.line][tt.tar]
