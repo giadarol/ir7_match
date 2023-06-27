@@ -59,9 +59,9 @@ newopt=madlang.load(open("ir7_optics5_2.str")).vars_to_dict()
 for k,v in newopt.items():
     lhc.vars[k]=v
 
-varylist = [
-    xt.Vary(nn, step=1e-6) for nn in lhc.vars.keys() if re.match(r"kq[t0-9].*\.[lr]7", nn)
-]
+
+namelist=[nn nn in lhc.vars.keys() if re.match(r"kq[t0-9].*\.[lr]7", nn)]
+varylist = [ xt.Vary(nn, step=1e-6) for nn in namelist ]
 
 act_sp1 = SinglePassDispersion(
     lhc.lhcb1, ele_start="tcp.d6l7.b1", ele_stop="tcspm.6r7.b1"
@@ -108,5 +108,7 @@ for tt in out['optimizer']._err.targets:
     print(f'{nn:25}: {rr:15.7e} {vv:15.7e} d={dd:15.7e} {dd<tt.tol}')
 
 
+for nn,vv in zip(varylist,out['res']):
+    print(f"{nn.name:15} {vv}")
 
 
