@@ -1,5 +1,4 @@
 import re
-
 import numpy as np
 
 import xtrack as xt
@@ -55,12 +54,14 @@ eir7b1 = tw1.get_twiss_init("e.ds.r7.b1")
 bir7b2 = tw2.get_twiss_init("s.ds.l7.b2")
 eir7b2 = tw2.get_twiss_init("e.ds.r7.b2")
 
+from pyoptics import madlang
+newopt=madlang.load(open("ir7_optics5_2.str")).vars_to_dict()
+for k,v in newopt.items():
+    lhc.vars[k]=v
 
 varylist = [
     xt.Vary(nn, step=1e-6) for nn in lhc.vars.keys() if re.match(r"kq.*\.[lr]7", nn)
 ]
-# varylist = [xt.Vary(nn,step=1e-6) for nn in [ 'kqt13.r7b1', 'kqt13.r7b2', 'kqt4.l7', 'kqt4.r7']]
-
 
 act_sp1 = SinglePassDispersion(
     lhc.lhcb1, ele_start="tcp.d6l7.b1", ele_stop="tcspm.6r7.b1"
@@ -69,8 +70,8 @@ act_sp2 = SinglePassDispersion(
     lhc.lhcb2, ele_start="tcp.d6r7.b2", ele_stop="tcspm.6l7.b2", backtrack=False
 )
 
+# build targets
 zz1 = ["e.ds.r7.b1", tw1, "lhcb1"], ["e.ds.r7.b2", tw2, "lhcb2"]
-
 zz = ["betx", "bety", "alfx", "alfy", "dx", "dpx", "mux", "muy"]
 ww = [1e-4, 1e-4, 1e-4, 1e-4, 1e-6, 1e-6, 1e-6, 1e-6]
 
@@ -87,7 +88,7 @@ out=lhc.match(
     ele_start=("s.ds.l7.b1", "s.ds.l7.b2"),
     ele_stop=("e.ds.r7.b1", "e.ds.r7.b2"),
     twiss_init=(bir7b1, bir7b2),
-    targets=tarlist,
+    targets=tarlist[:-2],
     vary=varylist,
     verbose=False,
     solver_options={"n_steps_max": 10},

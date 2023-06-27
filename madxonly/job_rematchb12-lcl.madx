@@ -1,0 +1,19 @@
+option,-echo,-info;
+option,-rbarc;
+call,file="hllhcb12.madx";
+call,file="macro.madx";
+
+
+exec,mk_beam(7000);
+call,file="opt_ramp_500_1500.madx";
+
+exec,check_ip(b1);
+exec,check_ip(b2);
+
+call,file="ir7_optics5_2.str";
+
+on_holdselect=1; jac_calls=   15;jac_tol=1e-20; jac_bisec=3;
+exec,select(7,67,78,b1);
+exec,select(7,67,78,b2);
+jac_calls=15;
+call,file="rematch_ir7b12.madx";
