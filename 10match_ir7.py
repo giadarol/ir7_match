@@ -60,7 +60,7 @@ for k,v in newopt.items():
     lhc.vars[k]=v
 
 
-namelist=[nn nn in lhc.vars.keys() if re.match(r"kq[t0-9].*\.[lr]7", nn)]
+namelist=sorted([nn for nn in lhc.vars.keys() if re.match(r"kq[t0-9].*\.[lr]7", nn)])
 varylist = [ xt.Vary(nn, step=1e-6) for nn in namelist ]
 
 act_sp1 = SinglePassDispersion(
