@@ -46,9 +46,6 @@ tw1 = lhc.lhcb1.twiss()
 tw2 = lhc.lhcb2.twiss()
 assert np.allclose(tw1["betx", "ip5"], 0.5)
 assert np.allclose(tw2["betx", "ip5"], 0.5)
-
-tw1 = lhc.lhcb1.twiss()
-tw2 = lhc.lhcb2.twiss()
 bir7b1 = tw1.get_twiss_init("s.ds.l7.b1")
 eir7b1 = tw1.get_twiss_init("e.ds.r7.b1")
 bir7b2 = tw2.get_twiss_init("s.ds.l7.b2")
@@ -75,11 +72,23 @@ zz1 = ["e.ds.r7.b1", tw1, "lhcb1"], ["e.ds.r7.b2", tw2, "lhcb2"]
 zz = ["betx", "bety", "alfx", "alfy", "dx", "dpx", "mux", "muy"]
 ww = [1e-4, 1e-4, 1e-4, 1e-4, 1e-6, 1e-6, 1e-6, 1e-6]
 
-tarlist = [
+tarlist_end = [
     xt.Target(oo, tw[oo, ee], line=ll, at=ee, tol=1e-7)
     for ee, tw, ll in zz1
     for oo,tl in zip(zz,ww)
-] + [
+]
+
+zz1 = ["ip7", tw1, "lhcb1"], ["ip7", tw2, "lhcb2"]
+zz = ["betx", "bety", "alfx", "alfy", "dx", "dpx"]
+ww = [1e-4, 1e-4, 1e-4, 1e-4, 1e-6, 1e-6]
+
+tarlist_ip = [
+    xt.Target(oo, lhc.vars[f"{oo}ip7b{ll[-1]}"]._value, line=ll, at=ee, tol=1e-7)
+    for ee, tw, ll in zz1
+    for oo,tl in zip(zz,ww)
+]
+
+tarlist_sp = [
         xt.Target(action=act_sp1, tar="dx", value=-0.03126, tol=1e-7),
         xt.Target(action=act_sp2, tar="dx", value=-0.03126, tol=1e-7),
     ]
@@ -88,7 +97,7 @@ out=lhc.match(
     ele_start=("s.ds.l7.b1", "s.ds.l7.b2"),
     ele_stop=("e.ds.r7.b1", "e.ds.r7.b2"),
     twiss_init=(bir7b1, bir7b2),
-    targets=tarlist[:-2],
+    targets=tarlist_end+tarlist_ip,
     vary=varylist,
     verbose=False,
     solver_options={"n_steps_max": 10},
