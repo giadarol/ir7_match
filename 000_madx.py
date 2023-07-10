@@ -108,8 +108,6 @@ endmatch;
 ''')
 
 
-
-
 mad.use('lhcb1')
 tw1_b1 = mad.twiss().dframe()
 mad.use('lhcb2')
