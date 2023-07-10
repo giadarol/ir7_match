@@ -47,3 +47,5 @@ collider.lhcb2.twiss_default['reverse']=True
 collider.build_trackers()
 
 tw = collider.twiss()
+
+collider.to_json('hllhc.json')
