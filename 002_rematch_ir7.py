@@ -1,4 +1,6 @@
+import time
 import xtrack as xt
+import numpy as np
 
 collider = xt.Multiline.from_json("hllhc.json")
 collider.build_trackers()
@@ -124,3 +126,20 @@ opt = collider.match(
         xt.Vary('kqt12.r7b2',  step=1.0E-9, limits=(-qtlimit5, qtlimit5)),
         xt.Vary('kqt13.r7b2',  step=1.0E-9, limits=(-qtlimit5, qtlimit5)),
     ])
+
+knobs_before = {}
+for kk in opt.vary:
+    knobs_before[kk.name] = collider.vars[kk.name]._value
+
+t1 = time.time()
+opt.solve()
+t2 = time.time()
+print(f"Xsuite optimization took {t2-t1} seconds")
+
+res = {}
+for kk in opt.vary:
+    res[kk.name] = collider.vars[kk.name]._value
+
+diffs = np.array([res[kk] - knobs_before[kk] for kk in res.keys()])
+
+norm_diff_xsuite = np.sqrt(np.sum(diffs**2))

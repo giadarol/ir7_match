@@ -1,4 +1,6 @@
+import numpy as np
 from cpymad import madx
+import time
 
 mad = madx.Madx()
 
@@ -29,8 +31,20 @@ exec,select(7,67,78,b2);
 jac_calls=15;
 ''')
 
+knob_names = ['kqt4.l7', 'kqt4.r7', 'kqt5.l7', 'kqt5.r7', 'kqt13.l7b1',
+    'kqt12.l7b1', 'kqtl11.l7b1', 'kqtl10.l7b1', 'kqtl9.l7b1', 'kqtl8.l7b1',
+    'kqtl7.l7b1', 'kq6.l7b1', 'kq6.r7b1', 'kqtl7.r7b1', 'kqtl8.r7b1',
+    'kqtl9.r7b1', 'kqtl10.r7b1', 'kqtl11.r7b1', 'kqt12.r7b1', 'kqt13.r7b1',
+    'kqt13.l7b2', 'kqt12.l7b2', 'kqtl11.l7b2', 'kqtl10.l7b2', 'kqtl9.l7b2',
+    'kqtl8.l7b2', 'kqtl7.l7b2', 'kq6.l7b2', 'kq6.r7b2', 'kqtl7.r7b2',
+    'kqtl8.r7b2', 'kqtl9.r7b2', 'kqtl10.r7b2', 'kqtl11.r7b2', 'kqt12.r7b2',
+    'kqt13.r7b2']
 
+knobs_before = {}
+for kk in knob_names:
+    knobs_before[kk] = mad.globals[kk]
 
+t1 = time.time()
 mad.input('''
 
 scale = 23348.89927;
@@ -106,7 +120,16 @@ jacobian,calls=jac_calls, tolerance=jac_tol, bisec=jac_bisec;
 endmatch;
 
 ''')
+t2 = time.time()
+print(f'Time for MAD-X matching: {t2-t1}')
 
+knobs_after = {}
+for kk in knob_names:
+    knobs_after[kk] = mad.globals[kk]
+
+diffs = np.array([knobs_after[kk] - knobs_before[kk] for kk in knobs_after.keys()])
+
+norm_diff_mad = np.sqrt(np.sum(diffs**2, axis=0))
 
 mad.use('lhcb1')
 tw1_b1 = mad.twiss().dframe()
